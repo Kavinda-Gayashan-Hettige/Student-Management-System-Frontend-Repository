@@ -2,13 +2,14 @@
 import { useEffect, useState } from "react";
 import { getCourses } from "@/app/services/api";
 import axios from "axios";
+import CourseCard from "@/app/components/CourseCard";
 
 export default function CoursesPage() {
   const [courses, setCourses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Form states matching CourseDto fields (courseName, courseCode, description)
+  
   const [courseName, setCourseName] = useState("");
   const [courseCode, setCourseCode] = useState("");
   const [description, setDescription] = useState("");
@@ -54,9 +55,8 @@ export default function CoursesPage() {
   return (
     <div 
       className="min-h-screen bg-cover bg-center bg-no-repeat relative text-zinc-900 py-10 px-4"
-      
+      style={{ backgroundImage: "url('/courses-bg.png')" }}
     >
-     
       <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-0"></div>
 
       <div className="relative z-10 max-w-5xl mx-auto">
@@ -136,42 +136,26 @@ export default function CoursesPage() {
           </div>
         )}
 
+        {/* Courses Cards Grid */}
         {!loading && !error && (
-          <div className="bg-white/90 backdrop-blur-md shadow-lg rounded-xl overflow-hidden border border-zinc-200">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-zinc-100/80 border-b border-zinc-200 text-xs uppercase tracking-wider text-zinc-600">
-                    <th className="p-4">ID</th>
-                    <th className="p-4">Course Name</th>
-                    <th className="p-4">Course Code</th>
-                    <th className="p-4">Description</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-zinc-200">
-                  {courses.length > 0 ? (
-                    courses.map((course: any) => (
-                      <tr key={course.id} className="hover:bg-zinc-50 transition">
-                        <td className="p-4 font-medium text-zinc-900">#{course.id}</td>
-                        <td className="p-4 font-semibold text-zinc-900">{course.courseName}</td>
-                        <td className="p-4">
-                          <span className="px-3 py-1 text-xs font-semibold bg-green-100 text-green-800 rounded-full">
-                            {course.courseCode}
-                          </span>
-                        </td>
-                        <td className="p-4 text-zinc-600">{course.description}</td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan={4} className="p-8 text-center text-zinc-500">
-                        No courses found in the database.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+          <div>
+            {courses.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {courses.map((course: any) => (
+                  <CourseCard
+                    key={course.id}
+                    id={course.id}
+                    courseName={course.courseName}
+                    courseCode={course.courseCode}
+                    description={course.description}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="bg-white/90 backdrop-blur-md p-12 text-center rounded-xl border border-zinc-200 shadow-lg text-zinc-500">
+                No courses found in the database.
+              </div>
+            )}
           </div>
         )}
       </div>
