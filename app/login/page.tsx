@@ -12,39 +12,38 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
+const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
     try {
-     
       const response = await axios.post('http://localhost:8080/api/auth/login', {
         username,
         password,
       });
 
-      
-      const token = response.data;
+      console.log("Full Login Response:", response.data);
 
-     
+      const token = response.data.token;
+      let rawRole = response.data.role || 'STUDENT';
+      const cleanRole = rawRole.replace('ROLE_', '').toUpperCase(); 
+
       localStorage.setItem('token', token);
+      localStorage.setItem('role', cleanRole); 
 
-     
-      router.push('/dashboard');
-    } catch (err: any) {
-      
-      if (err.response) {
-       
-        setError(err.response.data.message || 'Invalid username or password / Access Denied');
-      } else if (err.request) {
-      
-        setError('Unable to connect to the server. Please check if backend is running.');
+      console.log("Cleaned Role:", cleanRole);
+
+      if (cleanRole === 'ADMIN') {
+        router.push('/admin/dashboard');
       } else {
-        setError('An unexpected error occurred.');
+        router.push('/student/dashboard');
       }
+    } catch (err: any) {
+     
+      setError(err.response?.data?.message || 'Invalid username or password!');
     } finally {
-      setLoading(false);
+      setLoading(false); 
     }
   };
 

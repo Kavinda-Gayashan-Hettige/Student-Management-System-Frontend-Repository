@@ -14,6 +14,7 @@ api.interceptors.request.use(
   
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('token');
+      console.log("Attached Token:", token);
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }

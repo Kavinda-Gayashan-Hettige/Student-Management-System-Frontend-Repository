@@ -111,12 +111,8 @@ export default function DashboardPage() {
   };
 
   return (
-    <div 
-      className="min-h-screen bg-cover bg-center bg-no-repeat relative text-zinc-900 py-10 px-4"
-      style={{ backgroundImage: "url('/dashboard-bg.jpg')" }}
-    >
-      <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-0"></div>
-
+   
+    <div className="min-h-screen bg-gray-100 text-zinc-900 py-10 px-4 relative">
       <div className="relative z-10 max-w-5xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
@@ -131,7 +127,7 @@ export default function DashboardPage() {
               href="/"
               className="px-4 py-2 text-sm font-medium bg-zinc-200 text-zinc-800 rounded-lg hover:bg-zinc-300 transition shadow-sm"
             >
-              Home
+              Back to Home
             </a>
           </div>
         </div>
@@ -172,24 +168,24 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* Quick Links Section */}
+        
         <div className="bg-white/90 backdrop-blur-md p-6 rounded-xl shadow-lg border border-zinc-200">
           <h2 className="text-xl font-semibold mb-4 text-zinc-900">Quick Navigation</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <a
-              href="/students"
+              href="/admin/students"
               className="p-4 rounded-lg bg-zinc-100 text-zinc-800 hover:bg-blue-50 hover:text-blue-600 transition font-medium text-center border border-zinc-200 shadow-sm"
             >
               Manage Students ➔
             </a>
             <a
-              href="/courses"
+              href="/admin/courses"
               className="p-4 rounded-lg bg-zinc-100 text-zinc-800 hover:bg-green-50 hover:text-green-600 transition font-medium text-center border border-zinc-200 shadow-sm"
             >
               Manage Courses ➔
             </a>
             <a
-              href="/users"
+              href="/admin/users"
               className="p-4 rounded-lg bg-zinc-100 text-zinc-800 hover:bg-purple-50 hover:text-purple-600 transition font-medium text-center border border-zinc-200 shadow-sm"
             >
               Manage Users ➔

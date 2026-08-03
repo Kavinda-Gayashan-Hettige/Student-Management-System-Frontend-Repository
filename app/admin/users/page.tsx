@@ -53,12 +53,21 @@ export default function UsersPage() {
     }
   };
 
+  // Delete User Handler
+  const handleDeleteUser = async (id: number) => {
+    if (confirm("Are you sure you want to delete this user?")) {
+      try {
+        await axios.delete(`http://localhost:8080/api/users/${id}`);
+        fetchUsers();
+      } catch (err) {
+        console.error(err);
+        alert("Failed to delete user!");
+      }
+    }
+  };
+
   return (
-    <div 
-      className="min-h-screen bg-cover bg-center bg-no-repeat relative text-zinc-900 py-10 px-4"
-      
-    >
-      
+    <div className="min-h-screen bg-gray-100 text-zinc-900 py-10 px-4 relative">
       <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-0"></div>
 
       <div className="relative z-10 max-w-5xl mx-auto">
@@ -160,6 +169,7 @@ export default function UsersPage() {
                     <th className="p-4">Username</th>
                     <th className="p-4">Email</th>
                     <th className="p-4">Role</th>
+                    <th className="p-4 text-center">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-200">
@@ -174,11 +184,19 @@ export default function UsersPage() {
                             {user.role}
                           </span>
                         </td>
+                        <td className="p-4 text-center">
+                          <button
+                            onClick={() => handleDeleteUser(user.id)}
+                            className="px-3 py-1 text-xs font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 transition shadow-sm"
+                          >
+                            Delete
+                          </button>
+                        </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={4} className="p-8 text-center text-zinc-500">
+                      <td colSpan={5} className="p-8 text-center text-zinc-500">
                         No users found in the database.
                       </td>
                     </tr>

@@ -9,7 +9,6 @@ export default function CoursesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  
   const [courseName, setCourseName] = useState("");
   const [courseCode, setCourseCode] = useState("");
   const [description, setDescription] = useState("");
@@ -52,11 +51,21 @@ export default function CoursesPage() {
     }
   };
 
+  // Delete Course Handler
+  const handleDeleteCourse = async (id: number) => {
+    if (confirm("Are you sure you want to delete this course?")) {
+      try {
+        await axios.delete(`http://localhost:8080/api/courses/${id}`);
+        fetchCourses();
+      } catch (err) {
+        console.error(err);
+        alert("Failed to delete course!");
+      }
+    }
+  };
+
   return (
-    <div 
-      className="min-h-screen bg-cover bg-center bg-no-repeat relative text-zinc-900 py-10 px-4"
-      style={{ backgroundImage: "url('/courses-bg.png')" }}
-    >
+    <div className="min-h-screen bg-gray-100 text-zinc-900 py-10 px-4 relative">
       <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-0"></div>
 
       <div className="relative z-10 max-w-5xl mx-auto">
@@ -142,13 +151,22 @@ export default function CoursesPage() {
             {courses.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {courses.map((course: any) => (
-                  <CourseCard
-                    key={course.id}
-                    id={course.id}
-                    courseName={course.courseName}
-                    courseCode={course.courseCode}
-                    description={course.description}
-                  />
+                  <div key={course.id} className="flex flex-col justify-between bg-white rounded-xl border border-zinc-200 shadow-md p-5">
+                    <CourseCard
+                      id={course.id}
+                      courseName={course.courseName}
+                      courseCode={course.courseCode}
+                      description={course.description}
+                    />
+                    <div className="mt-4 pt-3 border-t border-zinc-100 flex justify-end">
+                      <button
+                        onClick={() => handleDeleteCourse(course.id)}
+                        className="px-3 py-1.5 text-xs font-medium bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition shadow-sm"
+                      >
+                        Delete Course
+                      </button>
+                    </div>
+                  </div>
                 ))}
               </div>
             ) : (

@@ -8,7 +8,8 @@ export default function StudentsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Form states for adding a new student
+  // Form states for adding/updating a student
+  const [studentId, setStudentId] = useState<number | null>(null); 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [course, setCourse] = useState("");
@@ -31,19 +32,34 @@ export default function StudentsPage() {
     fetchStudents();
   }, []);
 
+  // Submit Handler (Supports both Create and Update)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      await axios.post("http://localhost:8080/api/students", {
-        name,
-        email,
-        course,
-      });
+      if (studentId) {
+        // Update Student (PUT)
+        await axios.put(`http://localhost:8080/api/students/${studentId}`, {
+          name,
+          email,
+          course,
+        });
+        alert("Student updated successfully!");
+      } else {
+        // Create Student (POST)
+        await axios.post("http://localhost:8080/api/students", {
+          name,
+          email,
+          course,
+        });
+        alert("Student saved successfully!");
+      }
 
+      // Reset form and states
       setName("");
       setEmail("");
       setCourse("");
+      setStudentId(null);
 
       fetchStudents();
     } catch (err) {
@@ -54,12 +70,29 @@ export default function StudentsPage() {
     }
   };
 
+  // Edit Button Click Handler (Load data to form)
+  const handleEdit = (student: any) => {
+    setStudentId(student.id);
+    setName(student.name);
+    setEmail(student.email);
+    setCourse(student.course);
+  };
+
+  // Delete Student Handler (DELETE)
+  const handleDelete = async (id: number) => {
+    if (confirm("Are you sure you want to delete this student?")) {
+      try {
+        await axios.delete(`http://localhost:8080/api/students/${id}`);
+        fetchStudents();
+      } catch (err) {
+        console.error(err);
+        alert("Failed to delete student!");
+      }
+    }
+  };
+
   return (
-    <div 
-      className="min-h-screen bg-cover bg-center bg-no-repeat relative text-zinc-900 py-10 px-4"
-      
-    >
-      
+    <div className="min-h-screen bg-gray-100 text-zinc-900 py-10 px-4 relative">
       <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-0"></div>
 
       <div className="relative z-10 max-w-5xl mx-auto">
@@ -68,20 +101,39 @@ export default function StudentsPage() {
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-zinc-900">Students Management</h1>
             <p className="text-sm text-zinc-600 mt-1">
-              View, add, and manage all registered students from the database.
+              View, add, update, and delete registered students from the database.
             </p>
           </div>
           <a
-            href="/"
+            href="/admin/dashboard"
             className="px-4 py-2 text-sm font-medium bg-zinc-200 text-zinc-800 rounded-lg hover:bg-zinc-300 transition shadow-sm"
           >
-            Back to Home
+            Back to Dashboard
           </a>
         </div>
 
-        {/* Add Student Form */}
+        {/* Add / Update Student Form */}
         <div className="bg-white/90 backdrop-blur-md p-6 rounded-xl shadow-lg border border-zinc-200 mb-8">
-          <h2 className="text-xl font-semibold mb-4 text-zinc-900">Add New Student</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold text-zinc-900">
+              {studentId ? `Edit Student (ID: #${studentId})` : "Add New Student"}
+            </h2>
+            {studentId && (
+              <button
+                type="button"
+                onClick={() => {
+                  setStudentId(null);
+                  setName("");
+                  setEmail("");
+                  setCourse("");
+                }}
+                className="text-xs text-red-600 hover:underline font-medium"
+              >
+                Cancel Edit
+              </button>
+            )}
+          </div>
+
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-xs font-medium text-zinc-600 mb-1">Name</label>
@@ -120,9 +172,11 @@ export default function StudentsPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition disabled:opacity-50 shadow-sm"
+                className={`px-6 py-2 text-white font-medium rounded-lg transition disabled:opacity-50 shadow-sm ${
+                  studentId ? "bg-amber-600 hover:bg-amber-700" : "bg-blue-600 hover:bg-blue-700"
+                }`}
               >
-                {submitting ? "Saving..." : "Save Student"}
+                {submitting ? "Processing..." : studentId ? "Update Student" : "Save Student"}
               </button>
             </div>
           </form>
@@ -154,6 +208,7 @@ export default function StudentsPage() {
                     <th className="p-4">Name</th>
                     <th className="p-4">Email</th>
                     <th className="p-4">Course</th>
+                    <th className="p-4 text-center">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-200">
@@ -168,11 +223,25 @@ export default function StudentsPage() {
                             {student.course}
                           </span>
                         </td>
+                        <td className="p-4 text-center space-x-2">
+                          <button
+                            onClick={() => handleEdit(student)}
+                            className="px-3 py-1 text-xs font-medium bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition shadow-sm"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete(student.id)}
+                            className="px-3 py-1 text-xs font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 transition shadow-sm"
+                          >
+                            Delete
+                          </button>
+                        </td>
                       </tr>
                     ))
                   ) : (
                     <tr>
-                      <td colSpan={4} className="p-8 text-center text-zinc-500">
+                      <td colSpan={5} className="p-8 text-center text-zinc-500">
                         No students found in the database.
                       </td>
                     </tr>
